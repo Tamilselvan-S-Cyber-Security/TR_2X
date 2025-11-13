@@ -3,6 +3,7 @@
 import sys
 import os
 import argparse
+import urllib3
 from colorama import init, Fore, Style
 from modules.banner import display_banner
 from modules.menu import display_menu, get_user_choice
@@ -15,6 +16,7 @@ from modules.result_exporter import export_results
 from modules.url_validator import validate_url
 
 init(autoreset=True)
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 def main():
     parser = argparse.ArgumentParser(

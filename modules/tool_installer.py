@@ -41,9 +41,9 @@ EXTERNAL_TOOLS = {
 }
 
 def check_and_install_tools():
-    print(f"\n{Fore.CYAN}╔══════════════════════════════════════════════════════════════╗")
-    print(f"║            EXTERNAL TOOLS INSTALLATION GUIDE             ║")
-    print(f"╚══════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
+    print(f"\n{Fore.CYAN}╔═══════════════════════════════════════════════════════════════════════════╗")
+    print(f"║            EXTERNAL TOOLS INSTALLATION GUIDE                              ║")
+    print(f"╚═══════════════════════════════════════════════════════════════════════════╝{Style.RESET_ALL}\n")
     
     print(f"{Fore.YELLOW}[*] Checking for external penetration testing tools...{Style.RESET_ALL}\n")
     
