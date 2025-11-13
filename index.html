@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberWolf Scanner • Tool Installation Deck</title>
+<link rel="preload" href="vt323.regular.ttff" as="font" type="font/ttf" crossorigin>
+<link rel="icon" href="attached_assets/images/favicon.ico" type="image/x-icon">
+<style>
+    @font-face {
+        font-family: 'VT323';
+        src: url('vt323.regular.ttf') format('truetype');
+        font-display: swap;
+    }
+    :root {
+        color-scheme: light dark;
+        --bg: #14120B;
+        --panel: rgba(27, 25, 19, 0.92);
+        --panel-light: rgba(27, 25, 19, 0.75);
+        --accent: #38bdf8;
+        --accent-soft: rgba(56, 189, 248, 0.15);
+        --text: #e2e8f0;
+        --muted: #94a3b8;
+        --border: rgba(148, 163, 184, 0.25);
+        --shadow: rgba(8, 47, 73, 0.55);
+        --code: rgba(15, 118, 110, 0.16);
+    }
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        margin: 0;
+        font-family: 'VT323', "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.18), transparent 55%), radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.12), transparent 50%), var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        cursor: url('mouse.cur'), auto;
+    }
+    header {
+        padding: clamp(3rem, 5vw, 5rem) 1.5rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    header::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, rgba(56, 189, 248, 0.08), transparent 40%, rgba(56, 189, 248, 0.15));
+        pointer-events: none;
+    }
+    .hero {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: clamp(1.5rem, 4vw, 3rem);
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .hero-visual {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+    .hero-visual img {
+        width: min(360px, 100%);
+        max-width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+    }
+    .hero-copy {
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    .hero-logo {
+        width: clamp(70px, 10vw, 110px);
+        height: clamp(70px, 10vw, 110px);
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(56, 189, 248, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #ffffff;
+    }
+    .hero-logo img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        display: block;
+    }
+    .hero-copy h1 {
+        margin: 0;
+        font-size: clamp(2.6rem, 6vw, 3.6rem);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+    .hero-copy p {
+        margin: 0;
+        max-width: 580px;
+        line-height: 1.6;
+        color: var(--muted);
+        font-size: clamp(1.1rem, 2.6vw, 1.5rem);
+        letter-spacing: 0.04em;
+    }
+    .hero-copy p .hero-link {
+        color: var(--accent);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(56, 189, 248, 0.4);
+        transition: color 0.2s ease, border-color 0.2s ease;
+    }
+    .hero-copy p .hero-link:hover {
+        color: #0ea5e9;
+        border-color: rgba(56, 189, 248, 0.7);
+    }
+    .cta-row {
+        margin-top: 2.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    .cta {
+        padding: 0.75rem 1.4rem;
+        border-radius: 999px;
+        border: 1px solid rgba(56, 189, 248, 0.4);
+        background: linear-gradient(135deg, rgba(56, 189, 248, 0.22), rgba(56, 189, 248, 0.08));
+        color: var(--text);
+        text-decoration: none;
+        font-size: 1.2rem;
+        letter-spacing: 0.08em;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: url('attached_assets/mouse.cur'), pointer;
+    }
+    .cta.primary {
+        border-radius: 0;
+        background: #ffffff;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        color: #111827;
+        padding: 0.65rem 1.2rem;
+        letter-spacing: 0.07em;
+    }
+    .cta.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 22px -16px rgba(148, 163, 184, 0.6);
+    }
+    .cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px -18px rgba(56, 189, 248, 0.6);
+    }
+    main {
+        flex: 1;
+        padding: 0 1.5rem 3rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    .section-title {
+        margin: 3rem 0 1.5rem;
+        font-size: clamp(2rem, 4vw, 2.6rem);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+    .section-title::before {
+        content: "//";
+        color: var(--accent);
+        font-size: 1.2em;
+    }
+    .intro-panel {
+        background: var(--panel);
+        border-radius: 0;
+        padding: clamp(2rem, 4vw, 3rem);
+        box-shadow: 0 18px 35px -20px var(--shadow), inset 0 0 0 1px var(--border);
+        line-height: 1.6;
+        font-size: 1.3rem;
+        letter-spacing: 0.05em;
+    }
+    .intro-grid {
+        margin-top: 2rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.4rem;
+    }
+    .intro-card {
+        background: var(--panel-light);
+        padding: 1.5rem;
+        border-radius: 0;
+        box-shadow: inset 0 0 0 1px var(--border);
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .intro-card h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        letter-spacing: 0.06em;
+        color: var(--accent);
+    }
+    .intro-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.1rem;
+        letter-spacing: 0.03em;
+    }
+    .command-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    .command-card {
+        background: var(--panel);
+        border-radius: 0;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        box-shadow: 0 15px 32px -18px var(--shadow), inset 0 0 0 1px var(--border);
+        position: relative;
+    }
+    .command-card h3 {
+        margin: 0;
+        font-size: 1.6rem;
+        letter-spacing: 0.06em;
+    }
+    .command-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 1.1rem;
+        letter-spacing: 0.03em;
+        line-height: 1.5;
+    }
+    .command-output {
+        background: var(--code);
+        border-radius: 0;
+        padding: 1rem;
+        border: 1px solid rgba(45, 212, 191, 0.28);
+        font-family: 'VT323', "Fira Code", "Consolas", "Courier New", monospace;
+        font-size: 1.25rem;
+        line-height: 1.6;
+        min-height: 72px;
+        color: var(--text);
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    .copy-btn {
+        align-self: flex-start;
+        padding: 0.6rem 1.05rem;
+        border-radius: 0;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: #ffffff;
+        color: #111827;
+        font-size: 1.1rem;
+        letter-spacing: 0.05em;
+        cursor: url('attached_assets/mouse.cur'), pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .copy-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px -16px rgba(56, 189, 248, 0.5);
+    }
+    .copy-btn:active {
+        transform: scale(0.98);
+    }
+    .author-section {
+        margin: 3rem auto 0;
+        max-width: 1200px;
+        width: 100%;
+        padding: 0 1.5rem;
+    }
+    .author-card {
+        background: #ffffff;
+        color: #111827;
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        box-shadow: 0 18px 35px -22px rgba(15, 23, 42, 0.45);
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        display: flex;
+        align-items: center;
+        gap: clamp(1.5rem, 4vw, 2.5rem);
+        border-radius: 0;
+    }
+    .author-avatar {
+        width: clamp(90px, 12vw, 140px);
+        height: clamp(90px, 12vw, 140px);
+        border-radius: 50%;
+        overflow: hidden;
+        border: 3px solid rgba(56, 189, 248, 0.4);
+        flex-shrink: 0;
+    }
+    .author-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .author-copy h3 {
+        margin: 0 0 0.4rem;
+        font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .author-copy p {
+        margin: 0;
+        font-size: clamp(1rem, 2.3vw, 1.2rem);
+        letter-spacing: 0.05em;
+        line-height: 1.5;
+    }
+    .author-copy span {
+        display: inline-block;
+        margin-top: 0.4rem;
+        font-size: clamp(0.95rem, 2vw, 1.1rem);
+        letter-spacing: 0.04em;
+        color: #334155;
+    }
+    footer {
+        padding: 2rem 1rem;
+        text-align: center;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+        font-size: 1.05rem;
+    }
+    @media (max-width: 900px) {
+        .hero {
+            grid-template-columns: minmax(0, 1fr);
+            text-align: center;
+        }
+        .hero-visual {
+            justify-content: center;
+        }
+        .hero-copy {
+            text-align: center;
+            align-items: center;
+        }
+    }
+    @media (max-width: 640px) {
+        .intro-panel {
+            padding: 1.8rem;
+            font-size: 1.2rem;
+        }
+        .command-card h3 {
+            font-size: 1.4rem;
+        }
+        .command-output {
+            font-size: 1.15rem;
+        }
+    }
+</style>
+</head>
+<body>
+<header>
+    <div class="hero">
+        <div class="hero-visual">
+            <img src="images/2.gif" alt="CyberWolf Scanner animation">
+        </div>
+        <div class="hero-copy">
+            <div class="hero-logo">
+                <img src="images/favicon.ico" alt="CyberWolf logo">
+            </div>
+            <h1>CyberWolf Installation Node</h1>
+            <p>This tool developed by Cyberwolf team. The Cyber Wolf for more free course providing so join now! <a class="hero-link" href="https://cyberwolf.pro" target="_blank" rel="noopener">https://cyberwolf.pro</a></p>
+            <div class="cta-row">
+                <a class="cta primary" href="all_commands.html" target="_blank" rel="noopener">Explore Full Command Library</a>
+                <a class="cta" href="all_commands.txt" download>Download Text Reference</a>
+                <a class="cta" href="https://www.cyberwolf.pro/cyberwolfcommunity" target="_blank" rel="noopener">Join Community</a>
+            </div>
+        </div>
+    </div>
+</header>
+<main>
+    <section aria-labelledby="overview">
+        <h2 id="overview" class="section-title">Operation Briefing</h2>
+        <div class="intro-panel">
+            Accelerate deployment of the CyberWolf tooling kit. Each command pairs with a quick description so you know exactly what gets wired into your hunting environment. Drop these into your terminal, or copy them to your automation playbooks.
+            <div class="intro-grid">
+                <article class="intro-card">
+                    <h3>Curated Stack</h3>
+                    <p>Includes open redirect, XSS, and enrichment utilities that complement CyberWolf operations.</p>
+                </article>
+                <article class="intro-card">
+                    <h3>Ready to Copy</h3>
+                    <p>Every block is one tap away from your clipboard &mdash; no formatting cleanup required.</p>
+                </article>
+                <article class="intro-card">
+                    <h3>Consistent Style</h3>
+                    <p>Retro terminal vibes using VT323 for that hacker terminal authenticity.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+    <section aria-labelledby="commands">
+        <h2 id="commands" class="section-title">Tool Installation Commands</h2>
+        <div class="command-grid" id="command-grid"></div>
+    </section>
+    <section class="author-section">
+        <div class="author-card">
+            <div class="author-avatar">
+                <img src="images/favicon.ico" alt="S. Tamilselvan portrait">
+            </div>
+            <div class="author-copy">
+                <h3>Tamilselvan</h3>
+                <p>Cybersecurity researcher and lead architect behind CyberWolf Scanner. Passionate about sharing free, high-impact security education with the community.</p>
+                <span>Tool Author • CyberWolf Team</span>
+            </div>
+        </div>
+    </section>
+</main>
+<footer>© CyberWolf Scanner &mdash; Deployment Blueprint</footer>
+<script>
+const COMMANDS = [
+    {
+        title: "Open Redirect Tester (OR)",
+        description: "Install the OR CLI to validate and fuzz open redirect endpoints.",
+        command: "go install -v github.com/h6nt3r/or@latest"
+    },
+    {
+        title: "Matcher Utility",
+        description: "Clone matcher, apply execution permissions, and expose it globally.",
+        command: [
+            "cd /opt/ && sudo git clone https://github.com/h6nt3r/matcher.git",
+            "cd",
+            "sudo chmod +x /opt/matcher/match.py",
+            "sudo ln -sf /opt/matcher/match.py /usr/local/bin/match",
+            "match -h"
+        ].join("\\n")
+    },
+    {
+        title: "Reflected XSS Scanner (RC)",
+        description: "Compile the Go-based RC scanner for reflected cross-site scripting findings.",
+        command: "go install -v github.com/h6nt3r/rc@latest"
+    },
+    {
+        title: "Contextual XSS Scanner (CXSS)",
+        description: "Deploy CXSS for rich context extraction while triaging XSS leads.",
+        command: "go install github.com/haxshadow/cxss@latest"
+    },
+    {
+        title: "XSSER Toolkit",
+        description: "Install the XSSER automation suite for bulk payload delivery.",
+        command: "go install -v github.com/h6nt3r/xsser@latest"
+    }
+];
+
+const grid = document.getElementById("command-grid");
+
+function renderCommands() {
+    grid.innerHTML = "";
+    COMMANDS.forEach(({ title, description, command }) => {
+        const card = document.createElement("article");
+        card.className = "command-card";
+
+        const h3 = document.createElement("h3");
+        h3.textContent = title;
+        card.appendChild(h3);
+
+        const desc = document.createElement("p");
+        desc.textContent = description;
+        card.appendChild(desc);
+
+        const pre = document.createElement("pre");
+        pre.className = "command-output";
+        pre.textContent = command;
+        card.appendChild(pre);
+
+        const btn = document.createElement("button");
+        btn.className = "copy-btn";
+        btn.type = "button";
+        btn.textContent = "Copy";
+        btn.addEventListener("click", async () => {
+            try {
+                await navigator.clipboard.writeText(command);
+                btn.textContent = "Copied!";
+                setTimeout(() => (btn.textContent = "Copy"), 1400);
+            } catch (error) {
+                btn.textContent = "Error";
+                setTimeout(() => (btn.textContent = "Copy"), 1500);
+            }
+        });
+        card.appendChild(btn);
+        grid.appendChild(card);
+    });
+}
+
+renderCommands();
+</script>
+</body>
+</html>
+
